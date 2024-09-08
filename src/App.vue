@@ -8,28 +8,40 @@
       Detener simulación
     </button>
   </div>
-  <div>
-    <span class="margin"><b>Décimos por número:</b></span>
-    <select class="select-input margin" type="dropdown" v-model="tenth">
-      <option v-for="i in 10" :key="i" :value="i">{{ i }}</option>
-    </select>
-    <span class="margin"
-      ><b>Cupones: {{ lotteryTickets.length }}</b></span
-    >
-    <button class="margin" @click="handleAddTicket"><b>Añadir cupón</b></button>
-    <span class="margin">
-      <b>Coste total: {{ totalCost() }}€</b>
-    </span>
+  <div v-if="!isSimulationStarted">
+    <div>
+      <span class="margin"><b>Décimos por número:</b></span>
+      <select class="select-input margin" type="dropdown" v-model="tenth">
+        <option v-for="i in 10" :key="i" :value="i">{{ i }}</option>
+      </select>
+      <span class="margin"
+        ><b>Cupones: {{ lotteryTickets.length }}</b></span
+      >
+      <button class="margin" @click="handleAddTicket"><b>Añadir cupón</b></button>
+      <span class="margin">
+        <b>Coste total: {{ totalCost() }}€</b>
+      </span>
+    </div>
+    <div v-for="(ticket, idx) in lotteryTickets" :key="idx">
+      <input
+        class="ticket-input"
+        v-for="(digit, digitIndex) in DIGITS"
+        type="number"
+        :value="ticket[digitIndex]"
+        @input="handleTicketInput($event, idx, digitIndex)"
+      />
+      <button class="delete" @click="handleDelete(idx)">Borrar</button>
+    </div>
   </div>
-  <div v-for="(ticket, idx) in lotteryTickets" :key="idx">
-    <input
-      class="ticket-input"
-      v-for="(digit, digitIndex) in DIGITS"
-      type="number"
-      :value="ticket[digitIndex]"
-      @input="handleTicketInput($event, idx, digitIndex)"
-    />
-    <button class="delete" @click="handleDelete(idx)">Borrar</button>
+  <div v-if="isSimulationStarted">
+    <div class="tickets-display">
+      <span>Mis cupones: </span>
+      <div v-for="(ticket, idx) in lotteryTickets" :key="idx">
+        <span v-for="(digit, digitIndex) in DIGITS" :key="digitIndex">
+          {{ ticket[digitIndex] }}
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -43,6 +55,7 @@ const DIGITS = 5;
 const tenth = ref(1);
 const lotteryTickets = ref([]);
 const isSimulationRunning = ref(false);
+const isSimulationStarted = ref(false);
 
 onMounted(() => {
   lotteryTickets.value = [generateTicket()];
@@ -91,6 +104,7 @@ function totalCost() {
 }
 
 function startStopSimulation() {
+  if (!isSimulationStarted.value) isSimulationStarted.value = true;
   isSimulationRunning.value = !isSimulationRunning.value;
 }
 </script>
@@ -147,5 +161,13 @@ input[type="number"]::-webkit-outer-spin-button {
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
+}
+
+.tickets-display {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 </style>
