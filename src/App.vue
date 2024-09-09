@@ -39,6 +39,7 @@
       <div v-for="(ticket, idx) in lotteryTickets" :key="idx">
         <span v-for="(digit, digitIndex) in DIGITS" :key="digitIndex">
           {{ ticket[digitIndex] }}
+          hola
         </span>
       </div>
     </div>
